@@ -17,14 +17,14 @@ public interface HospedeDAO extends JpaRepository<Hospede, Integer> {
   @Query("select h from Hospede h where h.cpf = :cpf")
   public Hospede buscaPrimeiroPorCpf(String cpf);
 
-  // Consulta nativa para encontrar hóspedes com parte do CPF
+  // Consulta nativa para encontrar hóspedes com parte do CPF *N emp
   @Query(
     value = "SELECT * FROM hospedes WHERE cpf LIKE %:cpfPart%",
     nativeQuery = true
   )
   List<Hospede> findNativeByCpfPart(@Param("cpfPart") String cpfPart);
 
-  // Consulta JPQL para encontrar um hóspede com reservas pelo CPF
+  // Consulta JPQL para encontrar um hóspede com reservas pelo CPF *N emp
   @Query(
     "SELECT h FROM Hospede h LEFT JOIN FETCH h.reservas WHERE h.cpf = :cpf"
   )

@@ -48,7 +48,7 @@ classDiagram
     +getValorTotal(): float
   }
 
-  Hospede "1" --> "0..1" Reserva : possui
-  Reserva "1" --> "1" Quarto
+  Hospede "1" -- "0..1" Reserva : possui
+  Reserva "1" -- "1" Quarto
 ```
 
