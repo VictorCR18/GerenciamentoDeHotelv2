@@ -2,15 +2,19 @@ package br.ufc.quixada.dao;
 
 import br.ufc.quixada.entity.Quarto;
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-@Repository
-public interface QuartoDAO extends JpaRepository<Quarto, Integer> {
-  
-  // Consulta JPQL para encontrar quartos por tipo contendo uma determinada string (ignorando maiúsculas/minúsculas)
-  List<Quarto> findByTipoDeQuartoContainingIgnoreCase(String str);
+public interface QuartoDAO {
 
-  // Consulta JPQL para encontrar quartos por disponibilidade
-  List<Quarto> findByDisponivel(boolean disponivel);
+    List<Quarto> findByTipoDeQuartoContainingIgnoreCase(String str);
+
+    List<Quarto> findByDisponivel(boolean disponivel);
+
+    void save(Quarto quarto);
+
+    void deleteById(Integer id);
+
+    Optional<Quarto> findById(Integer id);
+
+    List<Quarto> findAll();
 }

@@ -52,7 +52,7 @@ public class MenuHospedes {
 
   // Método para obter a lista de hóspedes ordenados por nome
   public List<Hospede> listaHospedesOrdenadosPorNome() {
-    return baseHospedes.findAllOrderedIgnoreCase();
+    return baseHospedes.findAll();
   }
 
   // Método principal que exibe o menu para interação com hóspedes

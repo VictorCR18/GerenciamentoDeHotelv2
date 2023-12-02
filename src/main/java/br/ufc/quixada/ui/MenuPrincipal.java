@@ -9,9 +9,11 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+
 @SpringBootApplication(scanBasePackages = "br.ufc.quixada")
 @EntityScan("br.ufc.quixada.entity")
-@EnableJpaRepositories("br.ufc.quixada.dao")
+@EnableJpaRepositories("br.ufc.quixada.dao.jpa")
+// @EnableMongoRepositories("br.ufc.quixada.dao.mongo")
 @Slf4j
 public class MenuPrincipal implements CommandLineRunner {
 
