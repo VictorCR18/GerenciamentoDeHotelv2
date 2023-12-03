@@ -1,21 +1,24 @@
 package br.ufc.quixada.dao.jpa;
 
+import br.ufc.quixada.dao.HospedeDAO;
 import br.ufc.quixada.entity.Hospede;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HospedeJPADAO extends JpaRepository<Hospede, Integer> {
-  
-  // Encontra o primeiro hóspede com o CPF especificado
-  public Hospede findFirstByCpf(String cpf);
+public interface HospedeJPADAO
+  extends HospedeDAO, JpaRepository<Hospede, Integer> {
+  // JPQL
+  @Query("SELECT h FROM Hospede h WHERE h.nome = :nome")
+  public List<Hospede> findByNome(String nome);
 
-  // Consulta JPQL para encontrar o primeiro hóspede com o CPF especificado
+  // Encontra o primeiro hóspede com o CPF especificado
   @Query("select h from Hospede h where h.cpf = :cpf")
-  public Hospede buscaPrimeiroPorCpf(String cpf);
+  public Hospede findFirstByCpf(String cpf);
 
   // Consulta nativa para encontrar hóspedes com parte do CPF
   @Query(
@@ -46,6 +49,10 @@ public interface HospedeJPADAO extends JpaRepository<Hospede, Integer> {
     "select h from Hospede h where lower(h.nome) like lower(concat('%', :nome, '%'))"
   )
   public List<Hospede> buscaPorNomeContendoString(String nome);
+
+  @Modifying
+  @Query("DELETE FROM Hospede h WHERE h.cpf = :cpf")
+  void deleteByCpf(@Param("cpf") String cpf);
 
   // Conta o número total de hóspedes
   public Long countBy();

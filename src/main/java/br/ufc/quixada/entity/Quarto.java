@@ -1,33 +1,49 @@
 package br.ufc.quixada.entity;
 
-import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
 
+import jakarta.persistence.*;
+import java.util.List;
+
+import org.springframework.data.mongodb.core.mapping.Document;
+
 @Entity
+@Document(collection = "quartos")
 @Table(name = "quartos")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
+@Data
+
+@NamedQueries({
+    @NamedQuery(name = "findByTipo", query = "select q from Quarto q where q.tipo = :tipo")
+})
+
 public class Quarto {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+    @Column(unique = true, nullable = false)
+    private String capacidade;
+    private String numero;
+    private String tipo;
+    private float precoDaDiaria;
+    private boolean disponivel;
 
-  @NonNull
-  private String capacidade;
-  private String descricao;
-  private String tipoDeQuarto;
-  private float precoDaDiaria;
-  private boolean disponivel;
+    @OneToMany(mappedBy = "quarto", cascade = CascadeType.ALL)
+    private List<Reserva> reservas;
 
-  @OneToMany(mappedBy = "quarto", fetch = FetchType.EAGER)
-  private List<Reserva> reservas;
+    @Override
+    public String toString() {
+        return "QuartoId: " + id + ", " +
+                "Numero: " + numero + ", " +
+                "Capacidade: " + capacidade + ", " +
+                "Tipo: " + tipo + ", " +
+                "Preço da Diaria: R$" + precoDaDiaria + ", " +
+                "Disponivel: " + disponivel;
+    }
 
-  // Método que verifica se o quarto possui reservas
   public boolean temReserva() {
-      return reservas != null && !reservas.isEmpty();
+    return reservas != null && !reservas.isEmpty();
   }
 }

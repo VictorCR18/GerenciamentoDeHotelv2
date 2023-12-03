@@ -1,24 +1,30 @@
 package br.ufc.quixada.dao;
 
 import br.ufc.quixada.entity.Hospede;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface HospedeDAO {
+    public List<Hospede> findByNome(String nome);
 
     Hospede findFirstByCpf(String cpf);
-
-    Hospede buscaPrimeiroPorCpf(String cpf);
 
     List<Hospede> findByNomeStartingWithIgnoreCase(String str);
 
     List<Hospede> buscaPorNomeContendoString(String nome);
 
+    List<Hospede> findAllByOrderByNome();
+
     long count();
 
     void save(Hospede hospede);
 
-    void deleteById(Integer id);
+    void deleteById(String string);
+
+    @Transactional
+    void deleteByCpf(String cpf);
 
     Optional<Hospede> findById(Integer id);
 

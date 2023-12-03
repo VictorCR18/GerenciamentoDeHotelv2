@@ -5,14 +5,21 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReservaDAO {
-
-    List<Reserva> findByValorTotalGreaterThanEqual(float valor);
-
     void save(Reserva reserva);
 
-    void deleteById(Integer id);
+    void deleteById(String id);
 
-    Optional<Reserva> findById(Integer id);
+    Optional<Reserva> findById(String id);
+
+    public List<Reserva> findByHospedeId(String id);
+
+    public List<Reserva> findReservasByHospedeNome(String nome);
 
     List<Reserva> findAll();
+
+    List<Reserva> findByQuartoNumeroContaining(String numero);
+
+    List<Reserva> findReservasByQuartoTipo(String tipo);
+
+    List<Reserva> findByQuartoNumero(String numero);
 }

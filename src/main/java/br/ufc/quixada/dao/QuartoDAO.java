@@ -6,15 +6,15 @@ import java.util.Optional;
 
 public interface QuartoDAO {
 
-    List<Quarto> findByTipoDeQuartoContainingIgnoreCase(String str);
+    List<Quarto> findByTipoContainingIgnoreCase(String str);
 
     List<Quarto> findByDisponivel(boolean disponivel);
 
     void save(Quarto quarto);
 
-    void deleteById(Integer id);
+    void deleteById(String id);
 
-    Optional<Quarto> findById(Integer id);
+    Optional<Quarto> findById(String idToDisplay);
 
     List<Quarto> findAll();
 }

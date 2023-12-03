@@ -2,6 +2,8 @@ package br.ufc.quixada.ui;
 
 import br.ufc.quixada.dao.QuartoDAO;
 import br.ufc.quixada.entity.Quarto;
+import jakarta.transaction.Transactional;
+
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
@@ -25,16 +27,14 @@ public class MenuQuartos {
     "4 - Exibir por ID\n" +
     "5 - Exibir todos\n" +
     "6 - Exibir todos por tipo\n" +
-    "7 - Exibir todos disponiveis\n" + 
+    "7 - Exibir todos disponiveis\n" +
     "8 - Menu anterior";
 
   // Método para obter informações de um quarto
   public void obterQuarto(Quarto quarto) {
+    quarto.setNumero(JOptionPane.showInputDialog("Numero", quarto.getNumero()));
     quarto.setCapacidade(
       JOptionPane.showInputDialog("Capacidade", quarto.getCapacidade())
-    );
-    quarto.setDescricao(
-      JOptionPane.showInputDialog("Descrição", quarto.getDescricao())
     );
     List<String> opcoesTipoQuarto = Arrays.asList(
       "Standard",
@@ -50,11 +50,11 @@ public class MenuQuartos {
       JOptionPane.PLAIN_MESSAGE,
       null,
       opcoesTipoQuarto.toArray(),
-      quarto.getTipoDeQuarto()
+      quarto.getTipo()
     );
 
     // Atualize o tipo de quarto com a opção escolhida
-    quarto.setTipoDeQuarto(tipoQuartoSelecionado);
+    quarto.setTipo(tipoQuartoSelecionado);
 
     // Validação de entrada para o preço da diária
     boolean inputValido = false;
@@ -113,6 +113,7 @@ public class MenuQuartos {
   }
 
   // Método principal para interação com quartos
+  @Transactional
   public void menu() {
     char opcao = '0';
     do {
@@ -130,10 +131,8 @@ public class MenuQuartos {
             );
             break;
           case '2': // Atualizar por id
-            int id = Integer.valueOf(
-              JOptionPane.showInputDialog(
-                "Digite o ID do quarto a ser alterado"
-              )
+            String id = JOptionPane.showInputDialog(
+              "Digite o ID do quarto a ser alterado"
             );
             Quarto quartoToUpdate = baseQuartos.findById(id).orElse(null);
             if (quartoToUpdate != null) {
@@ -147,32 +146,26 @@ public class MenuQuartos {
             }
             break;
           case '3': // Remover por id
-            int idToRemove = Integer.valueOf(
-              JOptionPane.showInputDialog(
-                "Digite o ID do quarto a ser removido"
-              )
+            String idToRemove = JOptionPane.showInputDialog(
+              "Digite o ID do quarto a ser removido"
             );
             Quarto quartoToRemove = baseQuartos
               .findById(idToRemove)
               .orElse(null);
+
             if (quartoToRemove != null) {
               // Verifica se o quarto está associado a alguma reserva
+              baseQuartos.deleteById(quartoToRemove.getId());
+
               if (quartoToRemove.temReserva()) {
                 JOptionPane.showMessageDialog(
                   null,
                   "Não é possível remover o quarto porque está associado a uma reserva."
                 );
-              } else {
-                // Liberar o quarto
+              } else {// Liberar o quarto
                 quartoToRemove.setDisponivel(true);
                 baseQuartos.save(quartoToRemove);
-
-                // Remover o quarto
-                baseQuartos.deleteById(quartoToRemove.getId());
-                JOptionPane.showMessageDialog(
-                  null,
-                  "Quarto removido com sucesso!"
-                );
+                JOptionPane.showMessageDialog(null, "Quarto removido com sucesso!");
               }
             } else {
               JOptionPane.showMessageDialog(
@@ -182,8 +175,8 @@ public class MenuQuartos {
             }
             break;
           case '4': // Exibir por id
-            int idToDisplay = Integer.parseInt(
-              JOptionPane.showInputDialog("Digite o ID do quarto a ser exibido")
+            String idToDisplay = JOptionPane.showInputDialog(
+              "Digite o ID do quarto a ser exibido"
             );
             Quarto quartoToDisplay = baseQuartos
               .findById(idToDisplay)
@@ -218,7 +211,7 @@ public class MenuQuartos {
             // Verifica se o usuário selecionou um tipo
             if (tipoEscolhido != null) {
               //o método findByTipoDeQuartoContainingIgnoreCase para obter a lista de quartos
-              List<Quarto> quartosPorTipo = baseQuartos.findByTipoDeQuartoContainingIgnoreCase(
+              List<Quarto> quartosPorTipo = baseQuartos.findByTipoContainingIgnoreCase(
                 tipoEscolhido
               );
 

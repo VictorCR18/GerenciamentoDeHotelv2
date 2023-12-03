@@ -1,10 +1,10 @@
 package br.ufc.quixada.ui;
 
 import br.ufc.quixada.dao.HospedeDAO;
-import br.ufc.quixada.dao.QuartoDAO;
 import br.ufc.quixada.entity.Hospede;
-import br.ufc.quixada.entity.Reserva;
+import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 import javax.swing.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +17,6 @@ public class MenuHospedes {
   @Autowired
   private HospedeDAO baseHospedes;
 
-  @Autowired
-  private QuartoDAO baseQuartos;
-
   // Método para obter informações do hóspede
   public void obterHospede(Hospede h) {
     String nome = JOptionPane.showInputDialog("Nome", h.getNome());
@@ -31,6 +28,7 @@ public class MenuHospedes {
   }
 
   // Método para exibir a lista de hóspedes
+  @Transactional
   public void listaHospedes(List<Hospede> hospedes) {
     StringBuilder listagem = new StringBuilder();
     for (Hospede h : hospedes) {
@@ -43,6 +41,7 @@ public class MenuHospedes {
   }
 
   // Método para exibir informações de um hóspede
+  @Transactional
   public void listaHospede(Hospede h) {
     JOptionPane.showMessageDialog(
       null,
@@ -52,10 +51,11 @@ public class MenuHospedes {
 
   // Método para obter a lista de hóspedes ordenados por nome
   public List<Hospede> listaHospedesOrdenadosPorNome() {
-    return baseHospedes.findAll();
+    return baseHospedes.findAllByOrderByNome();
   }
 
   // Método principal que exibe o menu para interação com hóspedes
+  @Transactional
   public void menu() {
     StringBuilder menu = new StringBuilder("Menu Hospedes\n")
       .append("1 - Inserir\n")
@@ -77,6 +77,7 @@ public class MenuHospedes {
           case '1': // Inserir
             h = new Hospede();
             obterHospede(h);
+            h.setId(UUID.randomUUID().toString());
             baseHospedes.save(h);
             JOptionPane.showMessageDialog(
               null,
@@ -105,22 +106,11 @@ public class MenuHospedes {
             h = baseHospedes.findHospedeWithReservasByCpf(cpf);
 
             if (h != null) {
-              // Carregar explicitamente a lista de reservas dentro da transação
-              h.getReservas().size();
-
-              // Remover as reservas associadas ao hóspede
-              for (Reserva reserva : h.getReservas()) {
-                // Liberar o quarto associado à reserva
-                if (reserva.getQuarto() != null) {
-                  // Carregar explicitamente o quarto dentro da transação
-                  reserva.getQuarto().getId();
-                  reserva.getQuarto().setDisponivel(true);
-                  baseQuartos.save(reserva.getQuarto());
-                }
-              }
-
-              // Remover o hóspede
-              baseHospedes.deleteById(h.getId());
+              baseHospedes.deleteByCpf(cpf);
+              JOptionPane.showMessageDialog(
+                null,
+                "Hóspede removido com sucesso!"
+              );
             } else {
               JOptionPane.showMessageDialog(
                 null,
