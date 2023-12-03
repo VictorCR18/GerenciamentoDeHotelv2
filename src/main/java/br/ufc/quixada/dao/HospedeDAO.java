@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface HospedeDAO {
     public List<Hospede> findByNome(String nome);
 
+    Optional<Hospede> findByCpf(String cpf);
+
     Hospede findFirstByCpf(String cpf);
 
     List<Hospede> findByNomeStartingWithIgnoreCase(String str);

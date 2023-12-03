@@ -2,6 +2,8 @@ package br.ufc.quixada.dao;
 
 import br.ufc.quixada.entity.Hospede;
 import br.ufc.quixada.entity.Reserva;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +27,7 @@ public interface ReservaDAO {
     List<Reserva> findReservasByQuartoTipo(String tipo);
 
     List<Reserva> findByQuartoNumero(String numero);
+
+    @Transactional
+    void deleteByQuartoNumero(String numeroQuarto);
 }

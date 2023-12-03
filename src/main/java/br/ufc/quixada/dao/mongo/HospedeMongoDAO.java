@@ -41,4 +41,5 @@ public interface HospedeMongoDAO
 
   // Conta o número total de hóspedes
   long count();
+
 }

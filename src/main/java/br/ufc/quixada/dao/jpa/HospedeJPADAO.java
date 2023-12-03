@@ -56,4 +56,5 @@ public interface HospedeJPADAO
 
   // Conta o número total de hóspedes
   public Long countBy();
+
 }

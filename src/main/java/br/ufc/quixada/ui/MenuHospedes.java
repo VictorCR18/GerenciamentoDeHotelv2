@@ -1,13 +1,11 @@
 package br.ufc.quixada.ui;
 
 import br.ufc.quixada.dao.HospedeDAO;
-import br.ufc.quixada.dao.QuartoDAO;
-import br.ufc.quixada.dao.ReservaDAO;
 import br.ufc.quixada.entity.Hospede;
 import br.ufc.quixada.entity.Quarto;
-import br.ufc.quixada.entity.Reserva;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.swing.*;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +18,6 @@ public class MenuHospedes {
 
   @Autowired
   private HospedeDAO baseHospedes;
-
-  @Autowired
-  private QuartoDAO baseQuartos;
-
-  @Autowired
-  private ReservaDAO baseReservas;
 
   // Método para obter informações do hóspede
   public void obterHospede(Hospede h) {
@@ -110,37 +102,33 @@ public class MenuHospedes {
               );
             }
             break;
-          case '3':
-            // Remover por CPF
-            cpf = JOptionPane.showInputDialog("CPF");
-            h = baseHospedes.findHospedeWithReservasByCpf(cpf);
+          case '3': // Remover por CPF
+            String cpfToRemove = JOptionPane.showInputDialog(
+              "Digite o CPF do Hospede a ser removido"
+            );
+            Hospede hospedeToRemove = baseHospedes
+              .findByCpf(cpfToRemove)
+              .orElse(null);
 
-            if (h != null) {
-              if (h.temReservas()) {
-                // Lidar com a lógica de reservas antes de remover o hóspede
-                List<Reserva> reservas = h.getReservas();
-
-                // Remover reservas da base de dados
-                baseReservas.deleteAllByHospede(h);
-
-                // Atualizar a disponibilidade dos quartos associados
-                for (Reserva reserva : reservas) {
-                  Quarto quartoAssociado = reserva.getQuarto();
-                  quartoAssociado.setDisponivel(true);
-                  baseQuartos.save(quartoAssociado);
-                }
+            if (hospedeToRemove != null) {
+              // Verifica se o hospede está associado a alguma reserva
+              if (hospedeToRemove.getReservas() != null && !hospedeToRemove.getReservas().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                  null,
+                  "Não é possível remover o hospede porque está associado a uma reserva."
+                );
+              } else {
+                // Remove o hospede apenas se não houver reserva associada
+                baseHospedes.deleteByCpf(hospedeToRemove.getCpf());
+                JOptionPane.showMessageDialog(
+                  null,
+                  "Hospede removido com sucesso!"
+                );
               }
-
-              // Agora você pode remover o hóspede
-              baseHospedes.deleteByCpf(cpf);
-              JOptionPane.showMessageDialog(
-                null,
-                "Hóspede removido com sucesso!"
-              );
             } else {
               JOptionPane.showMessageDialog(
                 null,
-                "Não foi possível remover, pois o hóspede não foi encontrado."
+                "Não foi encontrado hospede com o CPF " + cpfToRemove
               );
             }
             break;

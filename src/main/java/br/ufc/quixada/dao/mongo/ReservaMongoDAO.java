@@ -3,6 +3,7 @@ package br.ufc.quixada.dao.mongo;
 import br.ufc.quixada.dao.ReservaDAO;
 import br.ufc.quixada.entity.Hospede;
 import br.ufc.quixada.entity.Reserva;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -29,4 +30,6 @@ public interface ReservaMongoDAO extends ReservaDAO, MongoRepository<Reserva, St
 
     void deleteAllByHospede(Hospede hospede);
 
+    @Transactional
+    void deleteByQuartoNumero(String numeroQuarto);
 }
