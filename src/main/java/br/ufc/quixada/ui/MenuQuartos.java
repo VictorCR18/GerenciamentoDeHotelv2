@@ -3,7 +3,6 @@ package br.ufc.quixada.ui;
 import br.ufc.quixada.dao.QuartoDAO;
 import br.ufc.quixada.entity.Quarto;
 import jakarta.transaction.Transactional;
-
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
@@ -145,7 +144,7 @@ public class MenuQuartos {
               );
             }
             break;
-          case '3': // Remover por id
+            case '3': // Remover por id
             String idToRemove = JOptionPane.showInputDialog(
               "Digite o ID do quarto a ser removido"
             );
@@ -155,17 +154,18 @@ public class MenuQuartos {
 
             if (quartoToRemove != null) {
               // Verifica se o quarto está associado a alguma reserva
-              baseQuartos.deleteById(quartoToRemove.getId());
-
-              if (quartoToRemove.temReserva()) {
+              if (quartoToRemove.getReservas() != null && !quartoToRemove.getReservas().isEmpty()) {
                 JOptionPane.showMessageDialog(
                   null,
                   "Não é possível remover o quarto porque está associado a uma reserva."
                 );
-              } else {// Liberar o quarto
-                quartoToRemove.setDisponivel(true);
-                baseQuartos.save(quartoToRemove);
-                JOptionPane.showMessageDialog(null, "Quarto removido com sucesso!");
+              } else {
+                // Remove o quarto apenas se não houver reserva associada
+                baseQuartos.deleteById(quartoToRemove.getId());
+                JOptionPane.showMessageDialog(
+                  null,
+                  "Quarto removido com sucesso!"
+                );
               }
             } else {
               JOptionPane.showMessageDialog(

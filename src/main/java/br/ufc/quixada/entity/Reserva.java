@@ -13,11 +13,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
-@NamedQueries({
-  @NamedQuery(name = "findReservasByHospedeNome", query = "select r from Reserva r where r.hospede.nome = :nome"),
-})
-
+@NamedQueries(
+  {
+    @NamedQuery(
+      name = "findReservasByHospedeNome",
+      query = "select r from Reserva r where r.hospede.nome = :nome"
+    ),
+  }
+)
 public class Reserva {
 
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -46,21 +49,17 @@ public class Reserva {
 
   @Override
   public String toString() {
-    // // Obtém o nome do hóspede (ou "N/A" se não houver hóspede associado)
-    // String hospedeNome = hospede != null ? hospede.getNome() : "N/A";
-
-    // // Obtém o ID do quarto (ou "N/A" se não houver quarto associado)
-    // String quartoId = quarto != null ? quarto.getId().toString() : "N/A";
+    String hospedeNome = hospede != null ? hospede.getNome() : "N/A";
 
     return (
       "Reserva [id=" +
       id +
       ", hospede=" +
-      hospede.getNome() +
+      hospedeNome +
       ", quarto=" +
-      quarto.getNumero() +
+      (quarto != null ? quarto.getNumero() : "N/A") +
       ", dataHora=" +
-      dataHora.format(formatter) +
+      (dataHora != null ? dataHora.format(formatter) : "N/A") +
       "]"
     );
   }

@@ -30,7 +30,7 @@ public class Hospede {
     private String nome;
     private String fone;
 
-    @OneToMany(mappedBy = "hospede")
+    @OneToMany(mappedBy = "hospede", cascade = CascadeType.ALL)
     private List<Reserva> reservas;
 
     @Override
@@ -65,5 +65,9 @@ public class Hospede {
         if (id == null) {
             id = UUID.randomUUID().toString();
         }
+    }
+
+    public boolean temReservas() {
+        return reservas != null && !reservas.isEmpty();
     }
 }

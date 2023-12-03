@@ -1,11 +1,14 @@
 package br.ufc.quixada.dao;
 
+import br.ufc.quixada.entity.Hospede;
 import br.ufc.quixada.entity.Reserva;
 import java.util.List;
 import java.util.Optional;
 
 public interface ReservaDAO {
     void save(Reserva reserva);
+
+    void deleteAllByHospede(Hospede hospede);
 
     void deleteById(String id);
 

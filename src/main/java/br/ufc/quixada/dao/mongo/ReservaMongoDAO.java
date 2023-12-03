@@ -1,6 +1,7 @@
 package br.ufc.quixada.dao.mongo;
 
 import br.ufc.quixada.dao.ReservaDAO;
+import br.ufc.quixada.entity.Hospede;
 import br.ufc.quixada.entity.Reserva;
 
 import java.util.List;
@@ -25,5 +26,7 @@ public interface ReservaMongoDAO extends ReservaDAO, MongoRepository<Reserva, St
 
     @Query("{'quarto.numero': ?0}")
     List<Reserva> findByQuartoNumero(String numero);
+
+    void deleteAllByHospede(Hospede hospede);
 
 }

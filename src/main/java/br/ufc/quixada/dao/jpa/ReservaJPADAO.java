@@ -1,6 +1,7 @@
 package br.ufc.quixada.dao.jpa;
 
 import br.ufc.quixada.dao.ReservaDAO;
+import br.ufc.quixada.entity.Hospede;
 import br.ufc.quixada.entity.Reserva;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,6 @@ public interface ReservaJPADAO
 
   @Query("SELECT r FROM Reserva r WHERE r.quarto.numero = :numero")
   List<Reserva> findByQuartoNumero(@Param("numero") String numero);
+
+  void deleteAllByHospede(Hospede hospede);
 }

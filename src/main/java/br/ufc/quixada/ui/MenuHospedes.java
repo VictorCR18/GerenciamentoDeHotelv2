@@ -1,7 +1,11 @@
 package br.ufc.quixada.ui;
 
 import br.ufc.quixada.dao.HospedeDAO;
+import br.ufc.quixada.dao.QuartoDAO;
+import br.ufc.quixada.dao.ReservaDAO;
 import br.ufc.quixada.entity.Hospede;
+import br.ufc.quixada.entity.Quarto;
+import br.ufc.quixada.entity.Reserva;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +20,12 @@ public class MenuHospedes {
 
   @Autowired
   private HospedeDAO baseHospedes;
+
+  @Autowired
+  private QuartoDAO baseQuartos;
+
+  @Autowired
+  private ReservaDAO baseReservas;
 
   // Método para obter informações do hóspede
   public void obterHospede(Hospede h) {
@@ -106,6 +116,22 @@ public class MenuHospedes {
             h = baseHospedes.findHospedeWithReservasByCpf(cpf);
 
             if (h != null) {
+              if (h.temReservas()) {
+                // Lidar com a lógica de reservas antes de remover o hóspede
+                List<Reserva> reservas = h.getReservas();
+
+                // Remover reservas da base de dados
+                baseReservas.deleteAllByHospede(h);
+
+                // Atualizar a disponibilidade dos quartos associados
+                for (Reserva reserva : reservas) {
+                  Quarto quartoAssociado = reserva.getQuarto();
+                  quartoAssociado.setDisponivel(true);
+                  baseQuartos.save(quartoAssociado);
+                }
+              }
+
+              // Agora você pode remover o hóspede
               baseHospedes.deleteByCpf(cpf);
               JOptionPane.showMessageDialog(
                 null,
@@ -114,10 +140,9 @@ public class MenuHospedes {
             } else {
               JOptionPane.showMessageDialog(
                 null,
-                "Não foi possível remover, pois o hospede não foi encontrado."
+                "Não foi possível remover, pois o hóspede não foi encontrado."
               );
             }
-
             break;
           case '4': // Exibir por CPF
             cpf = JOptionPane.showInputDialog("CPF");
