@@ -33,7 +33,7 @@ classDiagram
 
   class Quarto {
     -id: Integer
-    -capacidade: String
+    -Numero: String
     -descricao: String
     -tipoDeQuarto: String
     -precoDaDiaria: float
@@ -52,7 +52,7 @@ classDiagram
     +getValorTotal(): float
   }
 
-  Hospede "1" -- "0..*" Reserva : possui
-  Reserva "1" -- "1" Quarto
+  Hospede -- Reserva : possui
+  Reserva -- Quarto
 ```
 
