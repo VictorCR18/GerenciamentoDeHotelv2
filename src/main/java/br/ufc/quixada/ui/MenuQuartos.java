@@ -144,7 +144,7 @@ public class MenuQuartos {
               );
             }
             break;
-            case '3': // Remover por id
+          case '3': // Remover por id
             String idToRemove = JOptionPane.showInputDialog(
               "Digite o ID do quarto a ser removido"
             );
@@ -154,7 +154,10 @@ public class MenuQuartos {
 
             if (quartoToRemove != null) {
               // Verifica se o quarto está associado a alguma reserva
-              if (quartoToRemove.getReservas() != null && !quartoToRemove.getReservas().isEmpty()) {
+              if (
+                quartoToRemove.getReservas() != null &&
+                !quartoToRemove.getReservas().isEmpty()
+              ) {
                 JOptionPane.showMessageDialog(
                   null,
                   "Não é possível remover o quarto porque está associado a uma reserva."
@@ -229,9 +232,7 @@ public class MenuQuartos {
             }
             break;
           case '7': // Exibir todos disponíveis
-            List<Quarto> quartosDisponiveis = baseQuartos.findByDisponivel(
-              true
-            );
+            List<Quarto> quartosDisponiveis = baseQuartos.findByDisponivelTrue();
             if (!quartosDisponiveis.isEmpty()) {
               listaQuartos(quartosDisponiveis);
             } else {

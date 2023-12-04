@@ -2,10 +2,8 @@ package br.ufc.quixada.ui;
 
 import br.ufc.quixada.dao.HospedeDAO;
 import br.ufc.quixada.entity.Hospede;
-import br.ufc.quixada.entity.Quarto;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.swing.*;
 import lombok.extern.slf4j.Slf4j;

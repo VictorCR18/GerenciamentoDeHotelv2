@@ -1,5 +1,7 @@
 package br.ufc.quixada.ui;
 
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
 import javax.swing.JOptionPane;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,13 +9,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-// import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-  
+// import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
 @SpringBootApplication(scanBasePackages = "br.ufc.quixada")
 @EntityScan("br.ufc.quixada.entity")
-@EnableJpaRepositories("br.ufc.quixada.dao.jpa")  
-// @EnableMongoRepositories("br.ufc.quixada.dao.mongo")
+// @EnableJpaRepositories("br.ufc.quixada.dao.jpa")
+@EnableMongoRepositories("br.ufc.quixada.dao.mongo")
 @Slf4j
 public class MenuPrincipal implements CommandLineRunner {
 
@@ -32,18 +33,18 @@ public class MenuPrincipal implements CommandLineRunner {
       MenuPrincipal.class
     );
     builder.headless(false).run(args);
-    } 
-    
+  }
+
   // Implementação do método run da interface CommandLineRunner
   @Override
   public void run(String... args) throws Exception {
     StringBuilder menu = new StringBuilder("Menu Principal\n")
       .append("1 - Hospedes\n")
-      .append("2 - Quartos\n")    
+      .append("2 - Quartos\n")
       .append("3 - Reservas\n")
       .append("4 - Sair");
     char opcao = '0';
-    do { 
+    do {
       try {
         // Exibe o menu principal e obtém a opção escolhida pelo usuário
         opcao = JOptionPane.showInputDialog(menu).charAt(0);

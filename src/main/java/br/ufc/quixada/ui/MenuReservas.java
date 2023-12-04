@@ -6,13 +6,11 @@ import br.ufc.quixada.dao.ReservaDAO;
 import br.ufc.quixada.entity.Hospede;
 import br.ufc.quixada.entity.Quarto;
 import br.ufc.quixada.entity.Reserva;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.swing.JOptionPane;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,15 +22,58 @@ public class MenuReservas {
   private ReservaDAO baseReservas;
 
   @Autowired
-  private HospedeDAO baseHospedes;
-
-  @Autowired
   private QuartoDAO baseQuartos;
 
-  // Método para obter e salvar uma reserva
-  public void obterESalvarReserva(Reserva reserva) {
+  @Autowired
+  private HospedeDAO baseHospedes;
+
+  public void obterReserva(Reserva reserva) {
+    List<Quarto> quartosDisponiveis = baseQuartos.findByDisponivelTrue();
+    
+    if (quartosDisponiveis.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Nenhum quarto disponível.");
+        return;
+    }
+
+    Quarto[] arrayQuartos = quartosDisponiveis.toArray(new Quarto[0]);
+    Quarto quartoEscolhido = (Quarto) JOptionPane.showInputDialog(
+        null,
+        "Selecione um quarto",
+        "Quartos",
+        JOptionPane.PLAIN_MESSAGE,
+        null,
+        arrayQuartos,
+        reserva.getHospede()
+    );
+
+    if (quartoEscolhido != null && quartoEscolhido.isDisponivel()) {
+        reserva.setQuarto(quartoEscolhido);
+        reserva.setDataHora(LocalDateTime.now());
+    } else {
+        JOptionPane.showMessageDialog(
+            null,
+            "Nenhum quarto disponível ou quarto escolhido não está mais disponível. A reserva não será salva."
+        );
+        // Se o quarto não estiver disponível, retorne sem salvar a reserva
+        return;
+    }
+}
+
+  public void listarReservas(List<Reserva> reservas) {
+    StringBuilder listagem = new StringBuilder();
+    for (Reserva r : reservas) {
+      listagem.append(r.toString()).append("\n");
+    }
+    JOptionPane.showMessageDialog(
+      null,
+      listagem.length() == 0
+        ? "Nenhuma reserva encontrada"
+        : listagem.toString()
+    );
+  }
+
+  private void cadastrarReserva() {
     try {
-      // Obter lista de hóspedes
       List<Hospede> hospedes = baseHospedes.findAll();
       Hospede hospedeSelecionado = (Hospede) JOptionPane.showInputDialog(
         null,
@@ -41,7 +82,7 @@ public class MenuReservas {
         JOptionPane.PLAIN_MESSAGE,
         null,
         hospedes.toArray(),
-        reserva.getHospede()
+        null
       );
 
       if (hospedeSelecionado == null) {
@@ -52,54 +93,21 @@ public class MenuReservas {
         return;
       }
 
+      Reserva reserva = new Reserva();
       reserva.setHospede(hospedeSelecionado);
 
-      // Obter lista de quartos disponíveis
-      List<Quarto> quartosDisponiveis = baseQuartos.findByDisponivel(true);
-      Quarto quartoSelecionado = (Quarto) JOptionPane.showInputDialog(
-        null,
-        "Selecione um quarto",
-        "Quartos Disponíveis",
-        JOptionPane.PLAIN_MESSAGE,
-        null,
-        quartosDisponiveis.toArray(),
-        reserva.getQuarto()
-      );
+      obterReserva(reserva);
 
-      if (quartoSelecionado != null) {
-        reserva.setQuarto(quartoSelecionado);
-
-        if (reserva.getDataHora() == null) {
-          reserva.setDataHora(LocalDateTime.now());
-        }
-
-        // Iniciar transação para garantir consistência nos dados
-        baseReservas.save(reserva);
-
-        // Atualizar a disponibilidade do quarto para "falso"
-        quartoSelecionado.setDisponivel(false);
-        baseQuartos.save(quartoSelecionado);
-
-        Hibernate.initialize(hospedeSelecionado.getReservas());
-
-        // Inicializar a lista de reservas do hóspede se for null
-        List<Reserva> reservasDoHospede = hospedeSelecionado.getReservas();
-        if (reservasDoHospede == null) {
-          reservasDoHospede = new ArrayList<>();
-        }
-
-        // Associar a reserva ao hóspede
-        reservasDoHospede.add(reserva);
-        hospedeSelecionado.setReservas(reservasDoHospede);
-        baseHospedes.save(hospedeSelecionado);
-
-        JOptionPane.showMessageDialog(null, "Reserva realizada com sucesso!");
-      } else {
-        JOptionPane.showMessageDialog(
-          null,
-          "Nenhum quarto selecionado. A reserva não será salva."
-        );
+      // Antes de salvar a reserva, altere a disponibilidade do quarto associado para falso
+      Quarto quartoAssociado = reserva.getQuarto();
+      if (quartoAssociado != null) {
+        quartoAssociado.setDisponivel(false);
+        baseQuartos.save(quartoAssociado); // Atualize o estado do quarto no banco de dados
       }
+
+      reserva.setId(UUID.randomUUID().toString());
+      baseReservas.save(reserva);
+      JOptionPane.showMessageDialog(null, "Reserva realizada com sucesso!");
     } catch (Exception e) {
       log.error("Erro ao salvar reserva: {}", e.getMessage(), e);
       JOptionPane.showMessageDialog(
@@ -109,152 +117,72 @@ public class MenuReservas {
     }
   }
 
-  // Método para exibir uma lista de reservas
-  public void listaReservas(List<Reserva> reservas) {
-    StringBuilder listagem = new StringBuilder();
-    for (Reserva reserva : reservas) {
-      listagem.append(reserva);
-      listagem.append("\n");
-    }
-    JOptionPane.showMessageDialog(
-      null,
-      listagem.length() == 0 ? "Nenhuma reserva encontrada" : listagem
-    );
-  }
-
-  // Método para exibir as informações de uma reserva
-  public static void listaReserva(Reserva reserva) {
-    JOptionPane.showMessageDialog(
-      null,
-      reserva == null ? "Nenhuma reserva encontrada" : reserva
-    );
-  }
-
-  // Método principal para interação com reservas
-  @Transactional
   public void menu() {
-    StringBuilder menu = new StringBuilder("Menu Reservas\n")
-      .append("1 - Inserir\n")
-      .append("2 - Atualizar por N° do quarto\n")
-      .append("3 - Remover por N° do quarto\n")
-      .append("4 - Exibir por N° do quarto\n")
-      .append("5 - Exibir todos\n")
-      .append("6 - Menu anterior");
     char opcao = '0';
     do {
       try {
-        Reserva reserva;
+        StringBuilder menu = new StringBuilder("Menu de reservas")
+          .append("\n")
+          .append("1 - Inserir Reserva\n")
+          .append("2 - Atualizar Reserva por ID\n")
+          .append("3 - Deletar Reserva por ID\n")
+          .append("4 - Listar todas as reservas\n")
+          .append("5 - Menu anterior\n");
+        String id;
         opcao = JOptionPane.showInputDialog(menu).charAt(0);
         switch (opcao) {
-          case '1': // Inserir
-            reserva = new Reserva();
-            obterESalvarReserva(reserva);
+          case '1':
+            cadastrarReserva();
             break;
-          case '2': // Atualizar por número do quarto
-            String numeroQuartoAtualizar = JOptionPane.showInputDialog(
-              "Digite o N° do quarto da reserva a ser alterada"
-            );
-
-            // Modificação na consulta para encontrar a reserva pelo número do quarto
-            List<Reserva> reservasDoQuartoAtualizar = baseReservas.findByQuartoNumero(
-              numeroQuartoAtualizar
-            );
-
-            if (!reservasDoQuartoAtualizar.isEmpty()) {
-              // Vamos assumir que você quer atualizar a primeira reserva da lista.
-              // Você pode ajustar conforme necessário, por exemplo, pedindo ao usuário para escolher entre as reservas.
-              Reserva reservaAAtualizar = reservasDoQuartoAtualizar.get(0);
-
-              // Atualiza a reserva com base nas informações fornecidas pelo usuário
-              obterESalvarReserva(reservaAAtualizar);
-
-              JOptionPane.showMessageDialog(
-                null,
-                "Reserva atualizada com sucesso!"
+          case '2':
+            id =
+              JOptionPane.showInputDialog(
+                "Digite o ID da reseva a ser alterado"
               );
+            Reserva reservaToUpdate = baseReservas.findById(id).orElse(null);
+            if (reservaToUpdate != null) {
+              obterReserva(reservaToUpdate);
+              baseReservas.save(reservaToUpdate);
             } else {
               JOptionPane.showMessageDialog(
                 null,
-                "Não foi encontrada reserva para o quarto com o número " +
-                numeroQuartoAtualizar
+                "Não foi encontrado reserva com o ID " + id
               );
             }
             break;
-          case '3': // Remover por numero
-            String numeroQuarto = JOptionPane.showInputDialog(
-              "Digite o N° do quarto da reserva a ser removida"
+            case '3':
+            String idToRemove = JOptionPane.showInputDialog(
+                "Digite o ID da reserva a ser removido"
             );
-
-            // Modificação na consulta para encontrar a reserva pelo número do quarto
-            List<Reserva> reservasDoQuarto = baseReservas.findByQuartoNumero(
-              numeroQuarto
-            );
-
-            if (!reservasDoQuarto.isEmpty()) {
-              // Vamos assumir que você quer remover a primeira reserva da lista.
-              // Você pode ajustar conforme necessário, por exemplo, pedindo ao usuário para escolher entre as reservas.
-              Reserva reservaARemover = reservasDoQuarto.get(0);
-
-              // Obtém o quarto associado à reserva
-              Quarto quartoDaReserva = reservaARemover.getQuarto();
-
-              // Usando o método personalizado para excluir a reserva pelo número do quarto
-              baseReservas.deleteByQuartoNumero(numeroQuarto);
-
-              // Atualiza o quarto para disponível
-              quartoDaReserva.setDisponivel(true);
-              baseQuartos.save(quartoDaReserva);
-
-              JOptionPane.showMessageDialog(
-                null,
-                "Reserva removida com sucesso!"
-              );
+            Reserva reservaToRemove = baseReservas.findById(idToRemove).orElse(null);
+        
+            if (reservaToRemove != null) {
+                // Remova a reserva apenas se não houver reserva associada
+                baseReservas.delete(reservaToRemove);
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Reserva removida com sucesso!"
+                );
             } else {
-              JOptionPane.showMessageDialog(
-                null,
-                "Não foi encontrada reserva para o quarto com o número " +
-                numeroQuarto
-              );
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Não foi encontrada reserva com o ID " + idToRemove
+                );
             }
             break;
-          case '4': // Exibir por número do quarto
-            String numeroQuartoExibir = JOptionPane.showInputDialog(
-              "Digite o N° do quarto da reserva a ser exibida"
-            );
-
-            // Modificação na consulta para encontrar a reserva pelo número do quarto
-            List<Reserva> reservasDoQuartoExibir = baseReservas.findByQuartoNumero(
-              numeroQuartoExibir
-            );
-
-            if (!reservasDoQuartoExibir.isEmpty()) {
-              // Vamos assumir que você quer exibir a primeira reserva da lista.
-              // Você pode ajustar conforme necessário, por exemplo, pedindo ao usuário para escolher entre as reservas.
-              Reserva reservaAExibir = reservasDoQuartoExibir.get(0);
-
-              // Exibe as informações da reserva
-              listaReserva(reservaAExibir);
-            } else {
-              JOptionPane.showMessageDialog(
-                null,
-                "Não foi encontrada reserva para o quarto com o número " +
-                numeroQuartoExibir
-              );
-            }
+          case '4':
+            listarReservas(baseReservas.findAll());
             break;
-          case '5': // Exibir todos
-            listaReservas(baseReservas.findAll());
-            break;
-          case '6': // Menu anterior
+          case '5':
             break;
           default:
-            JOptionPane.showMessageDialog(null, "Opção Inválida");
+            JOptionPane.showMessageDialog(null, "Opção inválida");
             break;
         }
       } catch (Exception e) {
         log.error(e.getMessage(), e);
         JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
       }
-    } while (opcao != '6');
+    } while (opcao != '5');
   }
 }

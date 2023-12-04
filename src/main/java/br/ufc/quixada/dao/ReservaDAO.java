@@ -29,5 +29,6 @@ public interface ReservaDAO {
     List<Reserva> findByQuartoNumero(String numero);
 
     @Transactional
-    void deleteByQuartoNumero(String numeroQuarto);
+    void delete(Reserva reserva);
+
 }

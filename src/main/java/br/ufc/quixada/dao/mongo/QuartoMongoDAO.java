@@ -14,7 +14,7 @@ public interface QuartoMongoDAO extends QuartoDAO, MongoRepository<Quarto, Strin
     List<Quarto> findByTipoContainingIgnoreCase(String str);
 
     // Consulta para encontrar quartos por disponibilidade
-    List<Quarto> findByDisponivel(boolean disponivel);
+    List<Quarto> findByDisponivelTrue();
 
     void deleteById(String id);
 }

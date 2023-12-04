@@ -21,7 +21,7 @@ public interface HospedeDAO {
 
     long count();
 
-    void save(Hospede hospede);
+    void save(Hospede h);
 
     void deleteById(String string);
 

@@ -16,8 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NamedQueries(
   {
     @NamedQuery(
-      name = "findReservasByHospedeNome",
-      query = "select r from Reserva r where r.hospede.nome = :nome"
+      name = "reservaPorId",
+      query = "select r from Reserva r where r.id = :id"
     ),
   }
 )

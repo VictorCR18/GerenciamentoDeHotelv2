@@ -31,5 +31,5 @@ public interface ReservaJPADAO
   void deleteAllByHospede(Hospede hospede);
 
   @Transactional
-  void deleteByQuartoNumero(String numeroQuarto);
+  void delete(Reserva reserva);
 }

@@ -8,7 +8,7 @@ public interface QuartoDAO {
 
     List<Quarto> findByTipoContainingIgnoreCase(String str);
 
-    List<Quarto> findByDisponivel(boolean disponivel);
+    List<Quarto> findByDisponivelTrue();
 
     void save(Quarto quarto);
 

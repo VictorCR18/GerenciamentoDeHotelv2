@@ -13,7 +13,7 @@ public interface QuartoJPADAO extends QuartoDAO, JpaRepository<Quarto, Integer> 
   List<Quarto> findByTipoContainingIgnoreCase(String str);
 
   // Consulta JPQL para encontrar quartos por disponibilidade
-  List<Quarto> findByDisponivel(boolean disponivel);
+  List<Quarto> findByDisponivelTrue();
 
   void deleteById(String id);
 }

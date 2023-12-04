@@ -22,7 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Quarto {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
   @Column(unique = true, nullable = false)
