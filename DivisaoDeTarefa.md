@@ -4,8 +4,12 @@
 Nauan
 Responsável pela criação do Menu principal, Menu Reserva, ReservaDAO, entidade Reserva e também pela criação do diagrama de classes através da ferramenta Mermaid
 
+Fez a configuração da application.properties, o DAO generico, refez as entidades e testes
+
 Victor
 Responsável pela entidade Hospede, Quartos, Menu de ambos, HospedeDAO, QuartosDAO e preenchimento do Banco de Dados.
+
+Fez o Banco no Mongo Atlas, DAO do JPA e Mongo, refez os menus
 ----------------------- // ---------------------------------
 
 Aplicação JPA com Spring Boot e Spring Data JPA.
@@ -48,7 +52,7 @@ classDiagram
     +getValorTotal(): float
   }
 
-  Hospede "1" -- "0..1" Reserva : possui
+  Hospede "1" -- "0..*" Reserva : possui
   Reserva "1" -- "1" Quarto
 ```
 
