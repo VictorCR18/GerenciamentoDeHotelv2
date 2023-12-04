@@ -98,11 +98,11 @@ public class MenuReservas {
 
       obterReserva(reserva);
 
-      // Antes de salvar a reserva, altere a disponibilidade do quarto associado para falso
+      // Antes de salvar a reserva, altera a disponibilidade do quarto associado para falso
       Quarto quartoAssociado = reserva.getQuarto();
       if (quartoAssociado != null) {
         quartoAssociado.setDisponivel(false);
-        baseQuartos.save(quartoAssociado); // Atualize o estado do quarto no banco de dados
+        baseQuartos.save(quartoAssociado); // Atualiza o estado do quarto no banco de dados
       }
 
       reserva.setId(UUID.randomUUID().toString());
@@ -157,7 +157,7 @@ public class MenuReservas {
             Reserva reservaToRemove = baseReservas.findById(idToRemove).orElse(null);
         
             if (reservaToRemove != null) {
-                // Remova a reserva apenas se não houver reserva associada
+                // Remove a reserva apenas se não houver reserva associada
                 baseReservas.delete(reservaToRemove);
                 JOptionPane.showMessageDialog(
                     null,
